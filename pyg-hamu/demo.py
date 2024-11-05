@@ -10,7 +10,7 @@ pygame.init()
 pygame.mixer.init()
 
 # 設定視窗圖示
-icon = pygame.image.load(os.path.join('img', 'icon.png'))
+icon = pygame.image.load(os.path.join('pyg-hamu/img', 'icon.png'))
 pygame.display.set_icon(icon)
 
 # 遊戲視窗設置
@@ -30,13 +30,13 @@ PINK = (255, 192, 203)
 # 載入音效
 class Sounds:
     def __init__(self):
-        self.shoot = pygame.mixer.Sound("sound/shoot.wav")
-        self.explosion = pygame.mixer.Sound("sound/expl0.wav")
+        self.shoot = pygame.mixer.Sound("pyg-hamu/sound/shoot.wav")
+        self.explosion = pygame.mixer.Sound("pyg-hamu/sound/expl0.wav")
 
     @staticmethod
     def create_default_sounds():
         # 如果音效文件不存在，創建預設音效
-        if not os.path.exists("shoot.wav"):
+        if not os.path.exists("pyg-hamu/sound/shoot.wav"):
             pygame.mixer.Sound.play(pygame.mixer.Sound(pygame.mixer.Sound(bytes([0]*32))))
             pygame.mixer.Sound.play(pygame.mixer.Sound(pygame.mixer.Sound(bytes([0]*32))))
 
@@ -51,7 +51,7 @@ class Item:
         self.type = item_type
         self.radius = 10
         self.color = PINK if item_type == ItemType.HEART else GREEN
-
+        
     def draw(self):
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
         if self.type == ItemType.HEART:
@@ -83,7 +83,11 @@ class Player:
         self.shield_active = False
         self.shield_start_time = 0
         self.shield_duration = 5000  # 5秒盾牌持續時間
-
+        #載入player 圖像
+        self.image = pygame.image.load('pyg-hamu/img/player0.png')
+        self.image = pygame.transform.scale(self.image, (self.radius*2*8, self.radius*2*10)) #手動調整顯示尺寸
+        self.image_rect = self.image.get_rect(center=(self.x, self.y ))
+        
     def move(self, keys):
         if keys[pygame.K_a] and self.x > self.radius:
             self.x -= self.speed
@@ -101,11 +105,13 @@ class Player:
 
     def draw(self):
         # 繪製玩家
-        pygame.draw.circle(screen, BLUE, (self.x, self.y), self.radius)
+        # pygame.draw.circle(screen, BLUE, (self.x, self.y), self.radius)
+        self.image_rect.center = (self.x, self.y + self.radius) #取得角色中心位置，將角色放置在該物件中央
+        screen.blit(self.image,self.image_rect)
         
         # 如果盾牌激活，繪製盾牌效果
         if self.shield_active:
-            pygame.draw.circle(screen, GREEN, (self.x, self.y), self.radius + 5, 2)
+            pygame.draw.circle(screen, GREEN, (self.x, self.y), self.radius + 15, 2)
 
         # 繪製生命值
         for i in range(self.hearts):
