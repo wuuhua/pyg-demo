@@ -50,25 +50,30 @@ class Item:
         self.y = y
         self.type = item_type
         self.radius = 10
-        self.color = PINK if item_type == ItemType.HEART else GREEN
-        
+        # self.color = PINK if item_type == ItemType.HEART else GREEN
+        self.heart_image = pygame.image.load('pyg-hamu/img/heart.png')
+        self.heart_image = pygame.transform.scale(self.heart_image, (self.radius, self.radius))
+        self.shield_image = pygame.image.load('pyg-hamu/img/shield.png')
+        self.shield_image = pygame.transform.scale(self.image, (self.radius, self.radius))
     def draw(self):
-        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
+        # pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
         if self.type == ItemType.HEART:
             # 繪製愛心形狀
-            pygame.draw.polygon(screen, RED, [
-                (self.x, self.y - 5),
-                (self.x - 5, self.y - 8),
-                (self.x - 5, self.y - 2)
-            ])
-            pygame.draw.polygon(screen, RED, [
-                (self.x, self.y - 5),
-                (self.x + 5, self.y - 8),
-                (self.x + 5, self.y - 2)
-            ])
+            screen.blit(self.heart_image, (self.x, self.y))
+            # pygame.draw.polygon(screen, RED, [
+            #     (self.x, self.y - 5),
+            #     (self.x - 5, self.y - 8),
+            #     (self.x - 5, self.y - 2)
+            # ])
+            # pygame.draw.polygon(screen, RED, [
+            #     (self.x, self.y - 5),
+            #     (self.x + 5, self.y - 8),
+            #     (self.x + 5, self.y - 2)
+            # ])
         else:
             # 繪製盾牌形狀
-            pygame.draw.rect(screen, BLUE, (self.x - 5, self.y - 5, 10, 10))
+            screen.blit(self.shield_image, (self.x, self.y))
+            # pygame.draw.rect(screen, BLUE, (self.x - 5, self.y - 5, 10, 10))
 
 class Player:
     def __init__(self):
@@ -87,6 +92,9 @@ class Player:
         self.image = pygame.image.load('pyg-hamu/img/player0.png')
         self.image = pygame.transform.scale(self.image, (self.radius*2*8, self.radius*2*10)) #手動調整顯示尺寸
         self.image_rect = self.image.get_rect(center=(self.x, self.y ))
+        # 載入生命值圖像
+        self.heart_image = pygame.image.load('pyg-hamu/img/heart.png')
+        self.heart_image = pygame.transform.scale(self.heart_image, (self.radius, self.radius))
         
     def move(self, keys):
         if keys[pygame.K_a] and self.x > self.radius:
@@ -117,7 +125,8 @@ class Player:
         for i in range(self.hearts):
             heart_x = 30 + i * 30
             heart_y = 50
-            pygame.draw.circle(screen, RED, (heart_x, heart_y), 10)
+            screen.blit(self.heart_image, (heart_x, heart_y))
+            # pygame.draw.circle(screen, RED, (heart_x, heart_y), 10)
 
 class Enemy:
     def __init__(self):
