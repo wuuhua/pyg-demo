@@ -49,12 +49,12 @@ class Item:
         self.x = x
         self.y = y
         self.type = item_type
-        self.radius = 10
+        self.radius = 30
         # self.color = PINK if item_type == ItemType.HEART else GREEN
         self.heart_image = pygame.image.load('pyg-hamu/img/heart.png')
-        self.heart_image = pygame.transform.scale(self.heart_image, (self.radius, self.radius))
+        self.heart_image = pygame.transform.scale(self.heart_image, (self.radius*0.8, self.radius*0.8))
         self.shield_image = pygame.image.load('pyg-hamu/img/shield.png')
-        self.shield_image = pygame.transform.scale(self.image, (self.radius, self.radius))
+        self.shield_image = pygame.transform.scale(self.shield_image, (self.radius*0.8, self.radius))
     def draw(self):
         # pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
         if self.type == ItemType.HEART:
@@ -169,15 +169,26 @@ class Bullet:
         distance = math.sqrt(dx**2 + dy**2)
         self.dx = (dx/distance) if distance != 0 else 0
         self.dy = (dy/distance) if distance != 0 else 0
+        self.angle = math.atan2(dy, dx)
+        # self.angle = math.atan2(target_y - start_y, target_x - start_x)
         self.speed = 7
-        self.radius = 5
+        self.radius = 50
+        self.sprite = pygame.image.load('pyg-hamu/img/bullet.png')
+        self.image_rect = self.sprite.get_rect(center=(self.x, self.y ))
+        self.sprite = pygame.transform.scale(self.sprite, (self.radius, self.radius*1.5))
+        # self.sprite = pygame.transform.rotate(self.sprite, 90)
 
     def move(self):
         self.x += self.dx * self.speed
         self.y += self.dy * self.speed
 
-    def draw(self):
-        pygame.draw.circle(screen, WHITE, (int(self.x), int(self.y)), self.radius)
+    def draw(self, enemy_x, enemy_y):
+        angle = math.atan2(enemy_y - self.y, enemy_x - self.x)
+        rotated_image = pygame.transform.rotate(self.sprite, math.degrees(self.angle))
+        rect = rotated_image.get_rect(center=(int(self.x), int(self.y)))
+        screen.blit(rotated_image, rect)
+         # pygame.draw.circle(screen, WHITE, (int(self.x), int(self.y)), self.radius)
+
 
 def find_nearest_enemy(player: Player, enemies: List[Enemy]) -> Tuple[float, float]:
     if not enemies:
@@ -238,6 +249,7 @@ def main():
                 bullet.y < 0 or bullet.y > WINDOW_HEIGHT):
                 bullets.remove(bullet)
 
+
         # 更新敵人位置和碰撞檢測
         for enemy in enemies[:]:
             enemy.move(player.x, player.y)
@@ -288,7 +300,8 @@ def main():
         for enemy in enemies:
             enemy.draw()
         for bullet in bullets:
-            bullet.draw()
+            target_x, target_y = find_nearest_enemy(player, enemies)
+            bullet.draw(target_x, target_y)
         for item in items:
             item.draw()
 
