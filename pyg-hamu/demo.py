@@ -146,8 +146,18 @@ class Enemy:
 
         self.radius = 15
         self.speed = 2
-        self.health = random.randint(1, 3)
-        self.color = {1: RED, 2: GREEN, 3: BLACK}[self.health]
+        self.level = random.randint(1, 3)
+        self.health = self.level
+        if (self.level == 3):
+            self.image = pygame.image.load('pyg-hamu/img/hedgehog0.png')
+            self.image = pygame.transform.scale(self.image, (self.radius*2*10, self.radius*2*7)) #手動調整顯示尺寸
+        elif(self.level == 2):
+            self.image = pygame.image.load('pyg-hamu/img/lizard0.png')
+            self.image = pygame.transform.scale(self.image, (self.radius*2*8, self.radius*2*10)) #手動調整顯示尺寸
+        else:
+            self.image = pygame.image.load('pyg-hamu/img/crow0.png')
+            self.image = pygame.transform.scale(self.image, (self.radius*2*10, self.radius*2*8)) #手動調整顯示尺寸
+        self.color = {1: RED, 2: GREEN, 3: BLACK}[self.level]
 
     def move(self, player_x, player_y):
         dx = player_x - self.x
@@ -158,7 +168,13 @@ class Enemy:
             self.y += (dy/distance) * self.speed
 
     def draw(self):
-        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
+        # pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
+        
+        self.image_rect = self.image.get_rect(center=(self.x, self.y ))
+       
+        screen.blit(self.image, self.image_rect)
+            
+        
 
 class Bullet:
     def __init__(self, start_x, start_y, target_x, target_y):
@@ -233,7 +249,8 @@ def main():
         # 自動射擊
         if current_time - player.last_shot_time >= player.shoot_delay:
             target_x, target_y = find_nearest_enemy(player, enemies)
-            bullets.append(Bullet(player.x, player.y, target_x, target_y))
+            if((target_x != player.x)and (target_y != player.y)):
+                bullets.append(Bullet(player.x, player.y, target_x, target_y))
             player.last_shot_time = current_time
             sounds.shoot.play()
 
@@ -266,7 +283,7 @@ def main():
 
             # 檢查子彈碰撞
             for bullet in bullets[:]:
-                if math.sqrt((enemy.x - bullet.x)**2 + (enemy.y - bullet.y)**2) < enemy.radius + bullet.radius:
+                if math.sqrt((enemy.x - bullet.x)**2 + (enemy.y - bullet.y)**2) < (enemy.radius + bullet.radius-30):
                     enemy.health -= 1
                     bullets.remove(bullet)
                     if enemy.health <= 0:
@@ -278,8 +295,8 @@ def main():
                         if random.random() < 0.2:
                             item_type = random.choice([ItemType.HEART, ItemType.SHIELD])
                             items.append(Item(enemy.x, enemy.y, item_type))
-                    else:
-                        enemy.color = {1: RED, 2: GREEN, 3: BLACK}[enemy.health]
+                    # else:
+                    #     enemy.color = {1: RED, 2: GREEN, 3: BLACK}[enemy.health]
                     break
 
         # 更新道具碰撞檢測
@@ -306,13 +323,13 @@ def main():
             item.draw()
 
         # 顯示分數
-        score_text = font.render(f"分數: {score}", True, WHITE)
+        score_text = font.render(f"SCORE: {score}", True, WHITE)
         screen.blit(score_text, (10, 10))
 
         # 顯示盾牌剩餘時間
         if player.shield_active:
             shield_time = (player.shield_duration - (current_time - player.shield_start_time)) // 1000
-            shield_text = font.render(f"盾牌: {shield_time}秒", True, GREEN)
+            shield_text = font.render(f"SHIELD: {shield_time}秒", True, GREEN)
             screen.blit(shield_text, (10, 90))
 
         pygame.display.flip()
