@@ -1,3 +1,5 @@
+<img width="3334" height="2500" alt="start_screen4" src="https://github.com/user-attachments/assets/41de95ed-0b5f-4603-92b2-8b87a0d5c424" />
+
 ## 遊戲設定
 
 ### 玩家控制：
@@ -60,3 +62,4 @@
 ### 計時器系統：
 遊戲時間為 3 分鐘  
 時間到或消耗所有生命值顯示遊戲結束畫面
+
